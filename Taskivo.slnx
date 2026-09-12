@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Solution>
+  <Project Path="Taskivo-Controller/Taskivo-Controller.csproj" />
+  <Project Path="Taskivo-AppServices/Taskivo-AppServices.csproj" />
+  <Project Path="Taskivo-Commands/Taskivo-Commands.csproj" />
+  <Project Path="Taskivo-Common/Taskivo-Common.csproj" />
+  <Project Path="Taskivo-DTO/Taskivo-DTO.csproj" />
+  <Project Path="Taskivo-Infrastructure/Taskivo-Infrastructure.csproj" />
+  <Project Path="Taskivo-Queries/Taskivo-Queries.csproj" />
+</Solution>
