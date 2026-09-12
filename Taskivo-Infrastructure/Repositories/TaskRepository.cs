@@ -11,27 +11,27 @@ public class TaskRepository : ITaskRepository
         _context = context;
     }
 
-    public Task<IEnumerable<TaskItem>> GetAllAsync()
+    public Task<IEnumerable<TaskEntity>> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskItem?> GetByIdAsync(int id)
+    public Task<TaskEntity> GetByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskItem> AddAsync(TaskItem task)
+    public void AddAsync(TaskEntity task)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskItem?> UpdateAsync(TaskItem task)
+    public void UpdateAsync(TaskEntity task)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> DeleteAsync(int id)
+    public void DeleteAsync(Guid id)
     {
         throw new NotImplementedException();
     }

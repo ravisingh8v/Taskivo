@@ -4,9 +4,9 @@ namespace Taskivo_Infrastructure.Repositories;
 
 public interface ITaskRepository
 {
-    Task<IEnumerable<TaskItem>> GetAllAsync();
-    Task<TaskItem?> GetByIdAsync(int id);
-    Task<TaskItem> AddAsync(TaskItem task);
-    Task<TaskItem?> UpdateAsync(TaskItem task);
-    Task<bool> DeleteAsync(int id);
+    Task<IEnumerable<TaskEntity>> GetAllAsync();
+    Task<TaskEntity> GetByIdAsync(Guid id);
+    void AddAsync(TaskEntity task);
+    void UpdateAsync(TaskEntity task);
+    void DeleteAsync(Guid id);
 }
