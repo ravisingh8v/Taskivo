@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../Taskivo-Common/Taskivo-Common.csproj" />
     <ProjectReference Include="../Taskivo-DTO/Taskivo-DTO.csproj" />
-    <ProjectReference Include="../Taskivo-Infrastructure/Taskivo-Infrastructure.csproj" />
+    <!-- <ProjectReference Include="../Taskivo-Infrastructure/Taskivo-Infrastructure.csproj" /> -->
+    <ProjectReference Include="../Taskivo-Commands/Taskivo-Commands.csproj" />
   </ItemGroup>
 </Project>

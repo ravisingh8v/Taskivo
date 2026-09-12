@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Taskivo_Infrastructure.Models;
 
 namespace Taskivo_Infrastructure.Repositories;
@@ -11,28 +12,50 @@ public class TaskRepository : ITaskRepository
         _context = context;
     }
 
-    public Task<IEnumerable<TaskEntity>> GetAllAsync()
+    public async Task<IEnumerable<TaskEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+    
+     return await _context.Tasks
+            .AsNoTracking()
+            .Where(x => !x.IsDeleted)
+            .ToListAsync(cancellationToken);
     }
 
-    public Task<TaskEntity> GetByIdAsync(Guid id)
+    public async Task<TaskEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+       return await _context.Tasks
+            .FirstOrDefaultAsync(
+                x => x.Id == id && !x.IsDeleted,
+                cancellationToken);
     }
 
-    public void AddAsync(TaskEntity task)
+    public async Task<Guid> AddAsync(TaskEntity task, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+       var createdTask = await _context.Tasks.AddAsync(task, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        return createdTask.Entity.Id;
+
     }
 
-    public void UpdateAsync(TaskEntity task)
+    public async Task UpdateAsync(TaskEntity task, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        _context.Tasks.Update(task);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public void DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var task = await _context.Tasks
+            .FirstOrDefaultAsync(
+                x => x.Id == id && !x.IsDeleted,
+                cancellationToken);
+
+        if (task == null)
+            return;
+
+        task.IsDeleted = true;
+        task.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

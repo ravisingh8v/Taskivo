@@ -1,30 +1,46 @@
+using Taskivo_Commands;
+using Taskivo_Commands.Task;
 using Taskivo_DTO;
 
 namespace Taskivo_AppServices;
 
 public class TaskService : ITaskService
 {
-    public Task<IEnumerable<TaskDto>> GetAllTasksAsync()
+    private readonly ICommandHandler<CreateTaskCommand, Guid> _createHandler;
+
+    public TaskService(ICommandHandler<CreateTaskCommand, Guid> createHandler)
+    {
+        _createHandler = createHandler;
+    }
+
+    public Task<IEnumerable<TaskDto>> GetAllTasksAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskDto?> GetTaskByIdAsync(int id)
+    public Task<TaskDto?> GetTaskByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskDto> CreateTaskAsync(CreateTaskDto request)
+    public async Task<Guid> CreateTaskAsync(CreateTaskDto request, CancellationToken cancellationToken = default)
+    {
+        var command = new CreateTaskCommand(
+            request.Title ?? string.Empty,
+            request.Description,
+            request.Priority,           
+            request.DueDate
+        );
+
+        return await _createHandler.Handle(command, cancellationToken);
+    }
+
+    public Task<TaskDto?> UpdateTaskAsync(int id, UpdateTaskDto request, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskDto?> UpdateTaskAsync(int id, UpdateTaskDto request)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> DeleteTaskAsync(int id)
+    public Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

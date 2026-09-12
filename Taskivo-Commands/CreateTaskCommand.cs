@@ -1,0 +1,8 @@
+namespace Taskivo_Commands.Task;
+
+public record CreateTaskCommand(
+    string Title,
+    string? Description,
+    short Priority,
+    DateTime? DueDate
+);

@@ -4,9 +4,9 @@ namespace Taskivo_AppServices;
 
 public interface ITaskService
 {
-    Task<IEnumerable<TaskDto>> GetAllTasksAsync();
-    Task<TaskDto?> GetTaskByIdAsync(int id);
-    Task<TaskDto> CreateTaskAsync(CreateTaskDto request);
-    Task<TaskDto?> UpdateTaskAsync(int id, UpdateTaskDto request);
-    Task<bool> DeleteTaskAsync(int id);
+    Task<IEnumerable<TaskDto>> GetAllTasksAsync(CancellationToken cancellationToken = default);
+    Task<TaskDto?> GetTaskByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Guid> CreateTaskAsync(CreateTaskDto request, CancellationToken cancellationToken = default);
+    Task<TaskDto?> UpdateTaskAsync(int id, UpdateTaskDto request, CancellationToken cancellationToken = default);
+    Task<bool> DeleteTaskAsync(int id, CancellationToken cancellationToken = default);
 }

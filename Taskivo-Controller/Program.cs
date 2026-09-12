@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Taskivo_AppServices;
+using Taskivo_Commands;
+using Taskivo_Commands.Task;
+using Taskivo_DTO;
 using Taskivo_Infrastructure;
+using Taskivo_Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ICommandHandler<CreateTaskCommand, Guid>, CreateTaskCommandHandler>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
 builder.Services.AddOpenApi(options=>

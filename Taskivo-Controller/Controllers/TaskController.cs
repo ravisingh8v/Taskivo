@@ -30,23 +30,23 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTaskDto request)
+    public async Task<ActionResult<CreateTaskResponseDto>> Create([FromBody] CreateTaskDto request, CancellationToken cancellationToken = default)
     {
-        var createdTask = await _taskService.CreateTaskAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = createdTask.Id }, createdTask);
+        var taskId = await _taskService.CreateTaskAsync(request, cancellationToken);
+        return Created($"/api/task/{taskId}", new { id = taskId });
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateTaskDto request)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateTaskDto request, CancellationToken cancellationToken = default)
     {
-        var updatedTask = await _taskService.UpdateTaskAsync(id, request);
+        var updatedTask = await _taskService.UpdateTaskAsync(id, request, cancellationToken);
         return updatedTask is null ? NotFound() : Ok(updatedTask);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken = default)
     {
-        var deleted = await _taskService.DeleteTaskAsync(id);
+        var deleted = await _taskService.DeleteTaskAsync(id, cancellationToken);
         return deleted ? NoContent() : NotFound();
     }
 }

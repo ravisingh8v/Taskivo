@@ -2,7 +2,8 @@ namespace Taskivo_DTO;
 
 public class CreateTaskDto
 {
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = null!;
     public string? Description { get; set; }
+    public short Priority { get; set; } = 1;
     public DateTime? DueDate { get; set; }
 }
