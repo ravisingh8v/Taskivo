@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Taskivo_Infrastructure;
@@ -11,9 +12,11 @@ using Taskivo_Infrastructure;
 namespace TaskivoInfrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914160202_UpdateStatusAndPriorityMasterData")]
+    partial class UpdateStatusAndPriorityMasterData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,30 +200,7 @@ namespace TaskivoInfrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("Tasks_pkey");
 
-                    b.HasIndex("Priority");
-
-                    b.HasIndex("Status");
-
                     b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("Taskivo_Infrastructure.Models.TaskEntity", b =>
-                {
-                    b.HasOne("Taskivo_Infrastructure.Models.PriorityEntity", "PriorityDetails")
-                        .WithMany()
-                        .HasForeignKey("Priority")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Taskivo_Infrastructure.Models.StatusEntity", "StatusDetails")
-                        .WithMany()
-                        .HasForeignKey("Status")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("PriorityDetails");
-
-                    b.Navigation("StatusDetails");
                 });
 #pragma warning restore 612, 618
         }

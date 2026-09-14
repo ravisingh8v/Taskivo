@@ -59,7 +59,7 @@ public class TaskService : ITaskService
         var command = new CreateTaskCommand(
             request.Title,
             request.Description,
-            request.Priority,
+            request.PriorityId,
             request.DueDate
         );
 
@@ -88,7 +88,7 @@ public class TaskService : ITaskService
             Id = id,
             Title = request.Title,
             Description = request.Description,
-            Priority = request.Priority,
+            PriorityId = request.PriorityId,
             DueDate = request.DueDate
         };
 

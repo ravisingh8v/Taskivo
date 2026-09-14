@@ -3,7 +3,7 @@ using Taskivo_Infrastructure.Repositories;
 using Taskivo_Queries;
 using Taskivo_Queries.Task;
 
-public class GetAllTaskQueryHandler:IQueryHandler<GetAllTaskQuery, List<TaskDto>>
+public class GetAllTaskQueryHandler : IQueryHandler<GetAllTaskQuery, List<TaskDto>>
 {
     private readonly ITaskRepository _taskRepository;
 
@@ -11,22 +11,32 @@ public class GetAllTaskQueryHandler:IQueryHandler<GetAllTaskQuery, List<TaskDto>
     {
         _taskRepository = taskRepository;
     }
+
     public async Task<List<TaskDto>> Handle(GetAllTaskQuery query, CancellationToken cancellationToken = default)
     {
-        // Implement the logic to retrieve all tasks from the data source
-        // For demonstration purposes, returning a sample list of TaskDto
-         var tasks = await _taskRepository.GetAllAsync(cancellationToken);
-         return [.. tasks.Select(task => new TaskDto
-         {
-             Id = task.Id,
-             Title = task.Title,
-             DueDate = task.DueDate,
-             Priority = task.Priority,
-             Status = task.Status,
-             Description = task.Description,
-             CompletedAt = task.CompletedAt,
-             CreatedAt = task.CreatedAt,
-             UpdatedAt = task.UpdatedAt
-         })];
+        var tasks = await _taskRepository.GetAllAsync(cancellationToken);
+
+        return [.. tasks.Select(task => new TaskDto
+        {
+            Id = task.Id,
+            Title = task.Title,
+            Description = task.Description,
+            DueDate = task.DueDate,
+            CompletedAt = task.CompletedAt,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt,
+            Status = new TaskStatusDto
+            {
+                Id = task.Status,
+                Name = task.StatusDetails?.Name ?? "Unknown",
+                ColorHex = task.StatusDetails?.ColorHex ?? "#64748B"
+            },
+            Priority = new TaskPriorityDto
+            {
+                Id = task.Priority,
+                Name = task.PriorityDetails?.Name ?? "Unknown",
+                ColorHex = task.PriorityDetails?.ColorHex ?? "#64748B"
+            }
+        })];
     }
 }

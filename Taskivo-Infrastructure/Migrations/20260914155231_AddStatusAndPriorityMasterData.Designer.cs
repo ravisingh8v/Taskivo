@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Taskivo_Infrastructure;
@@ -11,9 +12,11 @@ using Taskivo_Infrastructure;
 namespace TaskivoInfrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914155231_AddStatusAndPriorityMasterData")]
+    partial class AddStatusAndPriorityMasterData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,17 +37,11 @@ namespace TaskivoInfrastructure.Migrations
                         .HasColumnType("character varying(7)")
                         .HasColumnName("color_hex");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -55,25 +52,19 @@ namespace TaskivoInfrastructure.Migrations
                         {
                             Id = (short)1,
                             ColorHex = "#10B981",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Low",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "Low"
                         },
                         new
                         {
                             Id = (short)2,
                             ColorHex = "#F59E0B",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Medium",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "Medium"
                         },
                         new
                         {
                             Id = (short)3,
                             ColorHex = "#EF4444",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "High",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "High"
                         });
                 });
 
@@ -89,17 +80,11 @@ namespace TaskivoInfrastructure.Migrations
                         .HasColumnType("character varying(7)")
                         .HasColumnName("color_hex");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -110,41 +95,31 @@ namespace TaskivoInfrastructure.Migrations
                         {
                             Id = (short)1,
                             ColorHex = "#2563EB",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "New",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "New"
                         },
                         new
                         {
                             Id = (short)2,
                             ColorHex = "#F59E0B",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "In-Progress",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "In-Progress"
                         },
                         new
                         {
                             Id = (short)3,
                             ColorHex = "#A78BFA",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "On Hold",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "On Hold"
                         },
                         new
                         {
                             Id = (short)4,
                             ColorHex = "#22C55E",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Completed",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "Completed"
                         },
                         new
                         {
                             Id = (short)5,
                             ColorHex = "#EF4444",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Discarded",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Name = "Discarded"
                         });
                 });
 
@@ -197,30 +172,7 @@ namespace TaskivoInfrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("Tasks_pkey");
 
-                    b.HasIndex("Priority");
-
-                    b.HasIndex("Status");
-
                     b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("Taskivo_Infrastructure.Models.TaskEntity", b =>
-                {
-                    b.HasOne("Taskivo_Infrastructure.Models.PriorityEntity", "PriorityDetails")
-                        .WithMany()
-                        .HasForeignKey("Priority")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Taskivo_Infrastructure.Models.StatusEntity", "StatusDetails")
-                        .WithMany()
-                        .HasForeignKey("Status")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("PriorityDetails");
-
-                    b.Navigation("StatusDetails");
                 });
 #pragma warning restore 612, 618
         }

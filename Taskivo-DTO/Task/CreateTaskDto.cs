@@ -4,6 +4,6 @@ public class CreateTaskDto
 {
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
-    public short Priority { get; set; } = 1;
+    public short PriorityId { get; set; } = 1;
     public DateTime? DueDate { get; set; }
 }

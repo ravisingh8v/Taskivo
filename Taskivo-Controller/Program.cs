@@ -6,6 +6,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddStartUpConfigurationServices(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -51,7 +60,7 @@ if (app.Environment.IsDevelopment())
         // options.SwaggerEndpoint("/swagger/v1/swagger.json", "Taskivo API v1");
     });
 }
-
+app.UseCors();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthorization();

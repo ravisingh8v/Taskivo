@@ -16,6 +16,8 @@ public class TaskRepository : ITaskRepository
     {
         return await _context.Tasks
             .AsNoTracking()
+            .Include(x => x.StatusDetails)
+            .Include(x => x.PriorityDetails)
             .Where(x => !x.IsDeleted)
             .ToListAsync(cancellationToken);
     }
@@ -23,6 +25,8 @@ public class TaskRepository : ITaskRepository
     public async Task<TaskEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Tasks
+            .Include(x => x.StatusDetails)
+            .Include(x => x.PriorityDetails)
             .FirstOrDefaultAsync(
                 x => x.Id == id && !x.IsDeleted,
                 cancellationToken);

@@ -21,7 +21,7 @@ public class CreateTaskCommandHandler : ICommandHandler<CreateTaskCommand, Guid>
         {
             Title = command.Title,
             Description = command.Description,
-            Priority = command.Priority,
+            Priority = command.PriorityId,
             DueDate = command.DueDate,
             Status = TaskStatusIds.New,
             CreatedAt = DateTime.UtcNow,

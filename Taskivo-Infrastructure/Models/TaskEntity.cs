@@ -15,6 +15,10 @@ namespace Taskivo_Infrastructure.Models
 
         public short Priority { get; set; }
 
+        public StatusEntity? StatusDetails { get; set; }
+
+        public PriorityEntity? PriorityDetails { get; set; }
+
         public DateTime? DueDate { get; set; }
 
         public DateTime? CompletedAt { get; set; }

@@ -24,7 +24,7 @@ public class UpdateTaskCommandHandler : ICommandHandler<UpdateTaskCommand, TaskD
 
         task.Title = command.Title;
         task.Description = command.Description;
-        task.Priority = command.Priority;
+        task.Priority = command.PriorityId;
         task.DueDate = command.DueDate;
         task.UpdatedAt = DateTime.UtcNow;
 
@@ -35,12 +35,22 @@ public class UpdateTaskCommandHandler : ICommandHandler<UpdateTaskCommand, TaskD
             Id = task.Id,
             Title = task.Title,
             Description = task.Description,
-            Status = task.Status,
-            Priority = task.Priority,
             DueDate = task.DueDate,
             CompletedAt = task.CompletedAt,
             CreatedAt = task.CreatedAt,
-            UpdatedAt = task.UpdatedAt
+            UpdatedAt = task.UpdatedAt,
+            Status = new TaskStatusDto
+            {
+                Id = task.Status,
+                Name = task.StatusDetails?.Name ?? "Unknown",
+                ColorHex = task.StatusDetails?.ColorHex ?? "#64748B"
+            },
+            Priority = new TaskPriorityDto
+            {
+                Id = task.Priority,
+                Name = task.PriorityDetails?.Name ?? "Unknown",
+                ColorHex = task.PriorityDetails?.ColorHex ?? "#64748B"
+            }
         };
     }
 }
