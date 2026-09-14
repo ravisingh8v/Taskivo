@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Taskivo_AppServices;
+using Taskivo_Common.Responses;
 using Taskivo_DTO;
 
 namespace Taskivo_Controller.Controllers;
@@ -16,37 +17,70 @@ public class TaskController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [ProducesResponseType(typeof(ApiResponse<List<TaskDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<List<TaskDto>>>> GetAll()
     {
         var tasks = await _taskService.GetAllTasksAsync();
-        return Ok(tasks);
+
+        return Ok(ApiResponse.Success(tasks));
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<TaskDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<TaskDto>>> GetById(Guid id)
     {
         var task = await _taskService.GetTaskByIdAsync(id);
-        return task is null ? NotFound() : Ok(task);
+
+        if (task is null)
+        {
+            return NotFound(ApiResponse.Error("Task not found."));
+        }
+
+        return Ok(ApiResponse.Success(task, "Task retrieved successfully."));
     }
 
     [HttpPost]
-    public async Task<ActionResult<CreateTaskResponseDto>> Create([FromBody] CreateTaskDto request, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ApiResponse<Guid>>> Create([FromBody] CreateTaskDto request, CancellationToken cancellationToken = default)
     {
         var taskId = await _taskService.CreateTaskAsync(request, cancellationToken);
-        return Created($"/api/task/{taskId}", new { id = taskId });
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = taskId },
+            ApiResponse.Success(taskId, "Task created successfully."));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTaskDto request, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(ApiResponse<TaskDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ApiResponse<TaskDto>>> Update(Guid id, [FromBody] UpdateTaskDto request, CancellationToken cancellationToken = default)
     {
         var updatedTask = await _taskService.UpdateTaskAsync(id, request, cancellationToken);
-        return updatedTask is null ? NotFound() : Ok(updatedTask);
+
+        if (updatedTask is null)
+        {
+            return NotFound(ApiResponse.Error("Task not found."));
+        }
+
+        return Ok(ApiResponse.Success(updatedTask, "Task updated successfully."));
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken cancellationToken = default)
     {
         var deleted = await _taskService.DeleteTaskAsync(id, cancellationToken);
-        return deleted ? NoContent() : NotFound();
+
+        if (!deleted)
+        {
+            return NotFound(ApiResponse.Error("Task not found."));
+        }
+
+        return Ok(ApiResponse.Success<object?>(null, "Task deleted successfully."));
     }
 }

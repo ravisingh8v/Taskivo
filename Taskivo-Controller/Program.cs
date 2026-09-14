@@ -1,41 +1,36 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
-using Taskivo.Queries;
-using Taskivo.Queries.Task;
-using Taskivo_AppServices;
-using Taskivo_Commands;
-using Taskivo_Commands.Task;
-using Taskivo_DTO;
-using Taskivo_Infrastructure;
-using Taskivo_Infrastructure.Repositories;
+using Taskivo_Controller.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
-builder.Services.AddScoped<ITaskService, TaskService>();
-builder.Services.AddScoped<ICommandHandler<CreateTaskCommand, Guid>, CreateTaskCommandHandler>();
-builder.Services.AddScoped<IQueryHandler<GetAllTaskQuery, List<TaskDto>>, GetAllTaskQueryHandler>();
+builder.Services.AddStartUpConfigurationServices(builder.Configuration);
 
-builder.Services.AddOpenApi(options=>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
 {
-   options.AddDocumentTransformer((document, context, calcellationToken) =>
-   {
-       document.Components ??=new OpenApiComponents();
-       document.Components.SecuritySchemes?.Add("Bearer", new OpenApiSecurityScheme
-       {
-           Type = SecuritySchemeType.Http,
-           Scheme = "bearer"
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Taskivo API v1",
+        Version = "v1",
+        Description = "Taskivo Task Management API"
+    });
 
-       });
-       return Task.CompletedTask;
-   });
+    // options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    // {
+    //     Name = "Authorization",
+    //     Type = SecuritySchemeType.Http,
+    //     Scheme = "bearer",
+    //     BearerFormat = "JWT",
+    //     In = ParameterLocation.Header,
+    //     Description = "Enter your JWT token."
+    // });
+
+    // options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    // {
+    //     [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    // });
 });
+
 
 var app = builder.Build();
 // ============================================================================
@@ -50,13 +45,14 @@ var app = builder.Build();
 // ============================================================================
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "Taskivo API v1");
+        // options.SwaggerEndpoint("/swagger/v1/swagger.json", "Taskivo API v1");
     });
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
