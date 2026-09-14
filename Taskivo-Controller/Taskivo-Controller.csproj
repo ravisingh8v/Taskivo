@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="../Taskivo-AppServices/Taskivo-AppServices.csproj" />
     <ProjectReference Include="../Taskivo-Commands/Taskivo-Commands.csproj" />
+    <ProjectReference Include="../Taskivo-Common/Taskivo-Common.csproj" />
     <ProjectReference Include="../Taskivo-DTO/Taskivo-DTO.csproj" />
     <ProjectReference Include="../Taskivo-Queries/Taskivo-Queries.csproj" />
   </ItemGroup>
