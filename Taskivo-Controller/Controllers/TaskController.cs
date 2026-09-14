@@ -69,6 +69,22 @@ public class TaskController : ControllerBase
         return Ok(ApiResponse.Success(updatedTask, "Task updated successfully."));
     }
 
+    [HttpPatch("{id}/status")]
+    [ProducesResponseType(typeof(ApiResponse<TaskDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ApiResponse<TaskDto>>> UpdateStatus(Guid id, [FromBody] UpdateTaskStatusDto request, CancellationToken cancellationToken = default)
+    {
+        var updatedTask = await _taskService.UpdateTaskStatusAsync(id, request, cancellationToken);
+
+        if (updatedTask is null)
+        {
+            return NotFound(ApiResponse.Error("Task not found."));
+        }
+
+        return Ok(ApiResponse.Success(updatedTask, "Task status updated successfully."));
+    }
+
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]

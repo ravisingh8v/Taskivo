@@ -45,6 +45,7 @@ services.AddScoped<ITaskService, TaskService>();
 // Command Handlers 
 services.AddScoped<ICommandHandler<CreateTaskCommand, Guid>, CreateTaskCommandHandler>();
 services.AddScoped<ICommandHandler<UpdateTaskCommand, TaskDto?>, UpdateTaskCommandHandler>();
+services.AddScoped<ICommandHandler<UpdateTaskStatusCommand, TaskDto?>, UpdateTaskStatusCommandHandler>();
 services.AddScoped<ICommandHandler<DeleteTaskCommand, bool>, DeleteTaskCommandHandler>();
 
 // Query Handlers

@@ -13,6 +13,7 @@ public class TaskService : ITaskService
     private readonly IQueryHandler<GetAllTaskQuery, List<TaskDto>> _getAllHandler;
     private readonly IQueryHandler<GetTaskByIdQuery, TaskDto?> _getByIdHandler;
     private readonly ICommandHandler<UpdateTaskCommand, TaskDto?> _updateHandler;
+    private readonly ICommandHandler<UpdateTaskStatusCommand, TaskDto?> _updateStatusHandler;
     private readonly ICommandHandler<DeleteTaskCommand, bool> _deleteHandler;
 
     public TaskService(
@@ -20,12 +21,14 @@ public class TaskService : ITaskService
         IQueryHandler<GetAllTaskQuery, List<TaskDto>> getAllHandler,
         IQueryHandler<GetTaskByIdQuery, TaskDto?> getByIdHandler,
         ICommandHandler<UpdateTaskCommand, TaskDto?> updateHandler,
+        ICommandHandler<UpdateTaskStatusCommand, TaskDto?> updateStatusHandler,
         ICommandHandler<DeleteTaskCommand, bool> deleteHandler)
     {
         _createHandler = createHandler;
         _getAllHandler = getAllHandler;
         _getByIdHandler = getByIdHandler;
         _updateHandler = updateHandler;
+        _updateStatusHandler = updateStatusHandler;
         _deleteHandler = deleteHandler;
     }
 
@@ -93,6 +96,32 @@ public class TaskService : ITaskService
         };
 
         return _updateHandler.Handle(command, cancellationToken);
+    }
+
+    public Task<TaskDto?> UpdateTaskStatusAsync(Guid id, UpdateTaskStatusDto request, CancellationToken cancellationToken = default)
+    {
+        if (id == Guid.Empty)
+        {
+            throw new BusinessException("Task id is required.");
+        }
+
+        if (request is null)
+        {
+            throw new BusinessException("Task payload is required.");
+        }
+
+        if (request.StatusId <= 0)
+        {
+            throw new BusinessException("Task status id is required.");
+        }
+
+        var command = new UpdateTaskStatusCommand
+        {
+            Id = id,
+            StatusId = request.StatusId
+        };
+
+        return _updateStatusHandler.Handle(command, cancellationToken);
     }
 
     public Task<bool> DeleteTaskAsync(Guid id, CancellationToken cancellationToken = default)
