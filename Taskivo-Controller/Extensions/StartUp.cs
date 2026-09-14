@@ -1,3 +1,6 @@
+using Taskivo_Commands.Auth;
+using Taskivo_Queries.Auth;
+using Taskivo_Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Taskivo_AppServices;
 using Taskivo_Commands;
@@ -43,6 +46,10 @@ services.AddScoped<ITaskRepository, TaskRepository>();
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<ITaskService, TaskService>();
 services.AddScoped<IAuthService, AuthService>();
+
+services.AddScoped<ICommandHandler<CreateUserCommand, UserEntity>, CreateUserCommandHandler>();
+services.AddScoped<IQueryHandler<UserExistsQuery, bool>, UserExistsQueryHandler>();
+services.AddScoped<IQueryHandler<GetUserByUsernameQuery, UserEntity?>, GetUserByUsernameQueryHandler>();
 
 // Command Handlers 
 services.AddScoped<ICommandHandler<CreateTaskCommand, Guid>, CreateTaskCommandHandler>();

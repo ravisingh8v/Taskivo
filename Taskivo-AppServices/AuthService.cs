@@ -7,19 +7,30 @@ using Microsoft.IdentityModel.Tokens;
 using Taskivo_Common.Exceptions;
 using Taskivo_DTO.Auth;
 using Taskivo_Infrastructure.Models;
-using Taskivo_Infrastructure.Repositories;
+using Taskivo_Commands;
+using Taskivo_Commands.Auth;
+using Taskivo_Queries;
+using Taskivo_Queries.Auth;
 
 namespace Taskivo_AppServices;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly ICommandHandler<CreateUserCommand, UserEntity> _createUserHandler;
+    private readonly IQueryHandler<UserExistsQuery, bool> _userExistsHandler;
+    private readonly IQueryHandler<GetUserByUsernameQuery, UserEntity?> _getUserByUsernameHandler;
     private readonly IConfiguration _configuration;
     private readonly PasswordHasher<UserEntity> _passwordHasher = new();
 
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
+    public AuthService(
+        ICommandHandler<CreateUserCommand, UserEntity> createUserHandler,
+        IQueryHandler<UserExistsQuery, bool> userExistsHandler,
+        IQueryHandler<GetUserByUsernameQuery, UserEntity?> getUserByUsernameHandler,
+        IConfiguration configuration)
     {
-        _userRepository = userRepository;
+        _createUserHandler = createUserHandler;
+        _userExistsHandler = userExistsHandler;
+        _getUserByUsernameHandler = getUserByUsernameHandler;
         _configuration = configuration;
     }
 
@@ -40,7 +51,7 @@ public class AuthService : IAuthService
 
         var username = request.Username.Trim();
 
-        if (await _userRepository.ExistsAsync(username, cancellationToken))
+        if (await _userExistsHandler.Handle(new UserExistsQuery(username), cancellationToken))
         {
             throw new BusinessException("Username already exists.", 409);
         }
@@ -57,7 +68,9 @@ public class AuthService : IAuthService
         };
 
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
-        await _userRepository.AddAsync(user, cancellationToken);
+        user = await _createUserHandler.Handle(
+            new CreateUserCommand(user.Id, user.Username, user.FirstName, user.LastName, user.PasswordHash),
+            cancellationToken);
 
         return BuildAuthResponse(user);
     }
@@ -74,7 +87,7 @@ public class AuthService : IAuthService
             throw new BusinessException("Username and password are required.");
         }
 
-        var user = await _userRepository.GetByUsernameAsync(request.Username.Trim(), cancellationToken);
+        var user = await _getUserByUsernameHandler.Handle(new GetUserByUsernameQuery(request.Username.Trim()), cancellationToken);
 
         if (user is null)
         {
