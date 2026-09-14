@@ -14,14 +14,14 @@ public class DeleteTaskCommandHandler : ICommandHandler<DeleteTaskCommand, bool>
 
     public async Task<bool> Handle(DeleteTaskCommand command, CancellationToken cancellationToken = default)
     {
-        var task = await _taskRepository.GetByIdAsync(command.Id, cancellationToken);
+        var task = await _taskRepository.GetByIdAsync(command.Id, command.UserId, cancellationToken);
 
         if (task is null)
         {
             return false;
         }
 
-        await _taskRepository.DeleteAsync(command.Id, cancellationToken);
+        await _taskRepository.DeleteAsync(command.Id, command.UserId, cancellationToken);
 
         return true;
     }

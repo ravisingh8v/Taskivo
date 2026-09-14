@@ -24,6 +24,7 @@ public class CreateTaskCommandHandler : ICommandHandler<CreateTaskCommand, Guid>
             Priority = command.PriorityId,
             DueDate = command.DueDate,
             Status = TaskStatusIds.New,
+            CreatedByUserId = command.CreatedByUserId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             IsDeleted = false

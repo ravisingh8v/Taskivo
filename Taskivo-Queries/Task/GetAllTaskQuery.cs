@@ -1,4 +1,6 @@
- namespace Taskivo_Queries.Task;
+namespace Taskivo_Queries.Task;
+
 public class GetAllTaskQuery
 {
+    public Guid UserId { get; set; }
 }

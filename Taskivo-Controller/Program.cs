@@ -1,9 +1,34 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Taskivo_Controller.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddStartUpConfigurationServices(builder.Configuration);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options =>
@@ -24,45 +49,39 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Taskivo Task Management API"
     });
 
-    // options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    // {
-    //     Name = "Authorization",
-    //     Type = SecuritySchemeType.Http,
-    //     Scheme = "bearer",
-    //     BearerFormat = "JWT",
-    //     In = ParameterLocation.Header,
-    //     Description = "Enter your JWT token."
-    // });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT token."
+    });
 
-    // options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    // {
-    //     [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-    // });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
+        }
+    });
 });
 
 
 var app = builder.Build();
-// ============================================================================
-// API DOCUMENTATION CONFIGURATION (.NET 10+)
-// ============================================================================
-// Why this setup?
-// 1. Framework Standard: We use first-party '.AddOpenApi()' to leverage the 
-//    high-performance native OpenAPI document generator built into .NET 10.
-// 2. Company Standard: We use '.UseSwaggerUI()' to map the interactive UI 
-//    to the native JSON spec, preserving the familiar '/swagger' route and 
-//    look-and-feel required by our team guidelines.
-// ============================================================================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        // options.SwaggerEndpoint("/swagger/v1/swagger.json", "Taskivo API v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Taskivo API v1");
     });
 }
 app.UseCors();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

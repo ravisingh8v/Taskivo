@@ -14,7 +14,7 @@ public class GetTaskByIdQueryHandler : IQueryHandler<GetTaskByIdQuery, TaskDto?>
 
     public async Task<TaskDto?> Handle(GetTaskByIdQuery query, CancellationToken cancellationToken = default)
     {
-        var task = await _taskRepository.GetByIdAsync(query.Id, cancellationToken);
+        var task = await _taskRepository.GetByIdAsync(query.Id, query.UserId, cancellationToken);
 
         if (task is null)
         {

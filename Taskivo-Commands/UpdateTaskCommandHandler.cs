@@ -15,7 +15,7 @@ public class UpdateTaskCommandHandler : ICommandHandler<UpdateTaskCommand, TaskD
 
     public async Task<TaskDto?> Handle(UpdateTaskCommand command, CancellationToken cancellationToken = default)
     {
-        var task = await _taskRepository.GetByIdAsync(command.Id, cancellationToken);
+        var task = await _taskRepository.GetByIdAsync(command.Id, command.UserId, cancellationToken);
 
         if (task is null)
         {

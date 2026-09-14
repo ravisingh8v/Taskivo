@@ -32,26 +32,41 @@ public class TaskService : ITaskService
         _deleteHandler = deleteHandler;
     }
 
-    public Task<List<TaskDto>> GetAllTasksAsync(CancellationToken cancellationToken = default)
+    public Task<List<TaskDto>> GetAllTasksAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return _getAllHandler.Handle(new GetAllTaskQuery(), cancellationToken);
+        if (userId == Guid.Empty)
+        {
+            throw new BusinessException("User id is required.");
+        }
+
+        return _getAllHandler.Handle(new GetAllTaskQuery { UserId = userId }, cancellationToken);
     }
 
-    public Task<TaskDto?> GetTaskByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public Task<TaskDto?> GetTaskByIdAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         if (id == Guid.Empty)
         {
             throw new BusinessException("Task id is required.");
         }
 
-        return _getByIdHandler.Handle(new GetTaskByIdQuery { Id = id }, cancellationToken);
+        if (userId == Guid.Empty)
+        {
+            throw new BusinessException("User id is required.");
+        }
+
+        return _getByIdHandler.Handle(new GetTaskByIdQuery { Id = id, UserId = userId }, cancellationToken);
     }
 
-    public async Task<Guid> CreateTaskAsync(CreateTaskDto request, CancellationToken cancellationToken = default)
+    public async Task<Guid> CreateTaskAsync(CreateTaskDto request, Guid userId, CancellationToken cancellationToken = default)
     {
         if (request is null)
         {
             throw new BusinessException("Task payload is required.");
+        }
+
+        if (userId == Guid.Empty)
+        {
+            throw new BusinessException("User id is required.");
         }
 
         if (string.IsNullOrWhiteSpace(request.Title))
@@ -63,17 +78,23 @@ public class TaskService : ITaskService
             request.Title,
             request.Description,
             request.PriorityId,
-            request.DueDate
+            request.DueDate,
+            userId
         );
 
         return await _createHandler.Handle(command, cancellationToken);
     }
 
-    public Task<TaskDto?> UpdateTaskAsync(Guid id, UpdateTaskDto request, CancellationToken cancellationToken = default)
+    public Task<TaskDto?> UpdateTaskAsync(Guid id, UpdateTaskDto request, Guid userId, CancellationToken cancellationToken = default)
     {
         if (id == Guid.Empty)
         {
             throw new BusinessException("Task id is required.");
+        }
+
+        if (userId == Guid.Empty)
+        {
+            throw new BusinessException("User id is required.");
         }
 
         if (request is null)
@@ -92,17 +113,23 @@ public class TaskService : ITaskService
             Title = request.Title,
             Description = request.Description,
             PriorityId = request.PriorityId,
-            DueDate = request.DueDate
+            DueDate = request.DueDate,
+            UserId = userId
         };
 
         return _updateHandler.Handle(command, cancellationToken);
     }
 
-    public Task<TaskDto?> UpdateTaskStatusAsync(Guid id, UpdateTaskStatusDto request, CancellationToken cancellationToken = default)
+    public Task<TaskDto?> UpdateTaskStatusAsync(Guid id, UpdateTaskStatusDto request, Guid userId, CancellationToken cancellationToken = default)
     {
         if (id == Guid.Empty)
         {
             throw new BusinessException("Task id is required.");
+        }
+
+        if (userId == Guid.Empty)
+        {
+            throw new BusinessException("User id is required.");
         }
 
         if (request is null)
@@ -118,19 +145,25 @@ public class TaskService : ITaskService
         var command = new UpdateTaskStatusCommand
         {
             Id = id,
-            StatusId = request.StatusId
+            StatusId = request.StatusId,
+            UserId = userId
         };
 
         return _updateStatusHandler.Handle(command, cancellationToken);
     }
 
-    public Task<bool> DeleteTaskAsync(Guid id, CancellationToken cancellationToken = default)
+    public Task<bool> DeleteTaskAsync(Guid id, Guid userId, CancellationToken cancellationToken = default)
     {
         if (id == Guid.Empty)
         {
             throw new BusinessException("Task id is required.");
         }
 
-        return _deleteHandler.Handle(new DeleteTaskCommand { Id = id }, cancellationToken);
+        if (userId == Guid.Empty)
+        {
+            throw new BusinessException("User id is required.");
+        }
+
+        return _deleteHandler.Handle(new DeleteTaskCommand { Id = id, UserId = userId }, cancellationToken);
     }
 }

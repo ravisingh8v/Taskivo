@@ -19,6 +19,10 @@ namespace Taskivo_Infrastructure.Models
 
         public PriorityEntity? PriorityDetails { get; set; }
 
+        public Guid? CreatedByUserId { get; set; }
+
+        public UserEntity? User { get; set; }
+
         public DateTime? DueDate { get; set; }
 
         public DateTime? CompletedAt { get; set; }

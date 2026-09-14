@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Taskivo-Common/Taskivo-Common.csproj" />
     <ProjectReference Include="../Taskivo-DTO/Taskivo-DTO.csproj" />
     <!-- <ProjectReference Include="../Taskivo-Infrastructure/Taskivo-Infrastructure.csproj" /> -->

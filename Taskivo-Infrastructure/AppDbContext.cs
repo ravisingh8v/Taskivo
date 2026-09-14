@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public virtual DbSet<TaskEntity> Tasks { get; set; }
+    public virtual DbSet<UserEntity> Users { get; set; }
     public virtual DbSet<StatusEntity> Statuses { get; set; }
     public virtual DbSet<PriorityEntity> Priorities { get; set; }
 
@@ -24,6 +25,7 @@ public class AppDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.CompletedAt).HasColumnName("completed_at");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("created_by_user_id");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.DueDate).HasColumnName("due_date");
             entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
@@ -33,6 +35,11 @@ public class AppDbContext : DbContext
                 .HasMaxLength(200)
                 .HasColumnName("title");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(e => e.StatusDetails)
                 .WithMany()
@@ -45,6 +52,35 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.Priority)
                 .HasPrincipalKey(e => e.Id)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<UserEntity>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("Users_pkey");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .IsRequired()
+                .HasColumnName("username");
+            entity.Property(e => e.FirstName)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("first_name");
+            entity.Property(e => e.LastName)
+                .HasMaxLength(100)
+                .IsRequired()
+                .HasColumnName("last_name");
+            entity.Property(e => e.PasswordHash)
+                .IsRequired()
+                .HasColumnName("password_hash");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasIndex(e => e.Username)
+                .IsUnique();
         });
 
         modelBuilder.Entity<StatusEntity>(entity =>

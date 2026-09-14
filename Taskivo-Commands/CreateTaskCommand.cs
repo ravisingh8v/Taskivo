@@ -4,5 +4,6 @@ public record CreateTaskCommand(
     string Title,
     string? Description,
     short PriorityId,
-    DateTime? DueDate
+    DateTime? DueDate,
+    Guid CreatedByUserId
 );

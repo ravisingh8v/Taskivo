@@ -40,7 +40,9 @@ services.AddControllers()
         };
     });
 services.AddScoped<ITaskRepository, TaskRepository>();
+services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<ITaskService, TaskService>();
+services.AddScoped<IAuthService, AuthService>();
 
 // Command Handlers 
 services.AddScoped<ICommandHandler<CreateTaskCommand, Guid>, CreateTaskCommandHandler>();
