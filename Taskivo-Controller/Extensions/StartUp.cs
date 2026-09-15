@@ -12,6 +12,10 @@ using Taskivo_Infrastructure;
 using Taskivo_Infrastructure.Repositories;
 using Taskivo_Queries;
 using Taskivo_Queries.Task;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi;
 
 namespace Taskivo_Controller.Extensions;
 public static class StartUp
@@ -42,6 +46,70 @@ services.AddControllers()
             return new BadRequestObjectResult(response);
         };
     });
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = configuration["Jwt:Issuer"],
+        ValidAudience= configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? string.Empty))
+    };
+});
+
+services.AddAuthorization();
+
+services.AddEndpointsApiExplorer();
+services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Taskivo API v1",
+        Version = "v1",
+        Description = "Taskivo Task Management API"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT token."
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
+        }
+    });
+});
+
+
+
+
+    
 services.AddScoped<ITaskRepository, TaskRepository>();
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<ITaskService, TaskService>();
