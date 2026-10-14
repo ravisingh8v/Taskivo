@@ -77,6 +77,67 @@ namespace TaskivoInfrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.ReminderEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsSent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_sent");
+
+                    b.Property<DateTime>("ReminderAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reminder_at");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("Reminder_pkey");
+
+                    b.HasIndex("UserId", "ReminderAt");
+
+                    b.HasIndex("ReminderAt", "IsSent", "DeletedAt");
+
+                    b.ToTable("Reminders");
+                });
+
             modelBuilder.Entity("Taskivo_Infrastructure.Models.StatusEntity", b =>
                 {
                     b.Property<short>("Id")
@@ -256,6 +317,17 @@ namespace TaskivoInfrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.ReminderEntity", b =>
+                {
+                    b.HasOne("Taskivo_Infrastructure.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Taskivo_Infrastructure.Models.TaskEntity", b =>

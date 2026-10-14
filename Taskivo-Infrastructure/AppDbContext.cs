@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public virtual DbSet<TaskEntity> Tasks { get; set; }
+    public virtual DbSet<ReminderEntity> Reminders { get; set; }
     public virtual DbSet<UserEntity> Users { get; set; }
     public virtual DbSet<StatusEntity> Statuses { get; set; }
     public virtual DbSet<PriorityEntity> Priorities { get; set; }
@@ -52,6 +53,52 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.Priority)
                 .HasPrincipalKey(e => e.Id)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ReminderEntity>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("Reminder_pkey");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()").HasColumnName("id");
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id")
+                .IsRequired();
+            entity.Property(e => e.Title)
+                .HasColumnName("title")
+                .HasMaxLength(200)
+                .IsRequired();
+            entity.Property(e => e.Description)
+                .HasColumnName("description")
+                .HasMaxLength(1000);
+            entity.Property(e => e.ReminderAt)
+                .HasColumnName("reminder_at")
+                .IsRequired();
+            entity.Property(e => e.IsSent)
+                .HasColumnName("is_sent")
+                .HasDefaultValue(false);
+            entity.Property(e => e.SentAt)
+                .HasColumnName("sent_at");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("NOW()");
+            entity.Property(e => e.UpdatedAt)
+               .HasColumnName("updated_at");
+            entity.Property(e => e.DeletedAt)
+               .HasColumnName("deleted_at");
+             entity.HasIndex(e => new
+                {
+                    e.UserId,
+                    e.ReminderAt
+                });
+            entity.HasIndex(e => new
+                {
+                    e.ReminderAt,
+                    e.IsSent,
+                    e.DeletedAt
+                });
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<UserEntity>(entity =>

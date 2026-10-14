@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
+using Taskivo_Queries.Reminder;
+using Taskivo_DTO.Reminder;
 
 namespace Taskivo_Controller.Extensions;
 public static class StartUp
@@ -105,29 +107,30 @@ services.AddSwaggerGen(options =>
         }
     });
 });
-
-
-
-
     
 services.AddScoped<ITaskRepository, TaskRepository>();
 services.AddScoped<IUserRepository, UserRepository>();
+services.AddScoped<IReminderRepository, ReminderRepository>();
+services.AddScoped<IReminderService, ReminderService>();
 services.AddScoped<ITaskService, TaskService>();
 services.AddScoped<IAuthService, AuthService>();
 
-services.AddScoped<ICommandHandler<CreateUserCommand, UserEntity>, CreateUserCommandHandler>();
-services.AddScoped<IQueryHandler<UserExistsQuery, bool>, UserExistsQueryHandler>();
-services.AddScoped<IQueryHandler<GetUserByUsernameQuery, UserEntity?>, GetUserByUsernameQueryHandler>();
 
 // Command Handlers 
+services.AddScoped<ICommandHandler<CreateUserCommand, UserEntity>, CreateUserCommandHandler>();
 services.AddScoped<ICommandHandler<CreateTaskCommand, Guid>, CreateTaskCommandHandler>();
 services.AddScoped<ICommandHandler<UpdateTaskCommand, TaskDto?>, UpdateTaskCommandHandler>();
 services.AddScoped<ICommandHandler<UpdateTaskStatusCommand, TaskDto?>, UpdateTaskStatusCommandHandler>();
 services.AddScoped<ICommandHandler<DeleteTaskCommand, bool>, DeleteTaskCommandHandler>();
+services.AddScoped<ICommandHandler<CreateReminderCommand, bool>, CreateReminderCommandHandler>();
 
 // Query Handlers
+services.AddScoped<IQueryHandler<UserExistsQuery, bool>, UserExistsQueryHandler>();
+services.AddScoped<IQueryHandler<GetUserByUsernameQuery, UserEntity?>, GetUserByUsernameQueryHandler>();
 services.AddScoped<IQueryHandler<GetAllTaskQuery, List<TaskDto>>, GetAllTaskQueryHandler>();
 services.AddScoped<IQueryHandler<GetTaskByIdQuery, TaskDto?>, GetTaskByIdQueryHandler>();
+services.AddScoped<IQueryHandler<GetAllReminderQuery, List<ReminderDto>>, GetAllReminderQueryHandler>();
+services.AddScoped<IQueryHandler<GetReminderByIdQuery, ReminderDto?>, GetReminderByIdQueryHandler>();
 
     }
 }
