@@ -5,6 +5,7 @@ namespace Taskivo_Infrastructure.Models
 {
     public partial class TaskEntity
     {
+
         public Guid Id { get; set; }
 
         public string Title { get; set; } = null!;

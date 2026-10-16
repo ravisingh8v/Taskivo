@@ -22,6 +22,72 @@ namespace TaskivoInfrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.PermissionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("Permissions_pkey");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Permissions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("4990d90f-c549-4653-a0b8-9ea74ba75154"),
+                            Description = "Permission to read tasks.",
+                            Name = "Tasks.Read"
+                        },
+                        new
+                        {
+                            Id = new Guid("28ca585b-008c-4c6d-9de5-3cdea4c0ffb3"),
+                            Description = "Permission to create tasks.",
+                            Name = "Tasks.Create"
+                        },
+                        new
+                        {
+                            Id = new Guid("bb933aaa-3d53-4777-99ec-6e51bda093df"),
+                            Description = "Permission to update tasks.",
+                            Name = "Tasks.Update"
+                        },
+                        new
+                        {
+                            Id = new Guid("cf54f7b4-c5d9-426a-a163-de7c8637ce24"),
+                            Description = "Permission to delete tasks.",
+                            Name = "Tasks.Delete"
+                        },
+                        new
+                        {
+                            Id = new Guid("b436114f-7eb9-44b9-90f6-916de2b2da52"),
+                            Description = "Permission to manage users.",
+                            Name = "Users.Manage"
+                        },
+                        new
+                        {
+                            Id = new Guid("304ac39e-a347-4acb-a8c6-d0a2639c4a06"),
+                            Description = "Permission to manage roles and permissions.",
+                            Name = "Roles.Manage"
+                        });
+                });
+
             modelBuilder.Entity("Taskivo_Infrastructure.Models.PriorityEntity", b =>
                 {
                     b.Property<short>("Id")
@@ -136,6 +202,118 @@ namespace TaskivoInfrastructure.Migrations
                     b.HasIndex("ReminderAt", "IsSent", "DeletedAt");
 
                     b.ToTable("Reminders");
+                });
+
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.RoleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("Roles_pkey");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            Description = "Administrator role with full access to all resources.",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("8542204b-0233-459c-8049-d1a4aca1ff6b"),
+                            Description = "Standard user role with limited access to resources.",
+                            Name = "User"
+                        });
+                });
+
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.RolePermissionEntity", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_id");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("permission_id");
+
+                    b.HasKey("RoleId", "PermissionId")
+                        .HasName("RolePermissions_pkey");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("RolePermissions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            PermissionId = new Guid("304ac39e-a347-4acb-a8c6-d0a2639c4a06")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            PermissionId = new Guid("b436114f-7eb9-44b9-90f6-916de2b2da52")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            PermissionId = new Guid("28ca585b-008c-4c6d-9de5-3cdea4c0ffb3")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            PermissionId = new Guid("4990d90f-c549-4653-a0b8-9ea74ba75154")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            PermissionId = new Guid("bb933aaa-3d53-4777-99ec-6e51bda093df")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856"),
+                            PermissionId = new Guid("cf54f7b4-c5d9-426a-a163-de7c8637ce24")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8542204b-0233-459c-8049-d1a4aca1ff6b"),
+                            PermissionId = new Guid("28ca585b-008c-4c6d-9de5-3cdea4c0ffb3")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8542204b-0233-459c-8049-d1a4aca1ff6b"),
+                            PermissionId = new Guid("4990d90f-c549-4653-a0b8-9ea74ba75154")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8542204b-0233-459c-8049-d1a4aca1ff6b"),
+                            PermissionId = new Guid("bb933aaa-3d53-4777-99ec-6e51bda093df")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("8542204b-0233-459c-8049-d1a4aca1ff6b"),
+                            PermissionId = new Guid("cf54f7b4-c5d9-426a-a163-de7c8637ce24")
+                        });
                 });
 
             modelBuilder.Entity("Taskivo_Infrastructure.Models.StatusEntity", b =>
@@ -319,6 +497,36 @@ namespace TaskivoInfrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.UserRoleEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("role_id");
+
+                    b.HasKey("UserId", "RoleId")
+                        .HasName("UserRoles_pkey");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("050f9135-b2ae-4fab-91c1-cac15141c95f"),
+                            RoleId = new Guid("bb10e887-c4eb-4473-85f8-556838100856")
+                        },
+                        new
+                        {
+                            UserId = new Guid("62bee773-93bd-42f8-8774-a44161e833a0"),
+                            RoleId = new Guid("8542204b-0233-459c-8049-d1a4aca1ff6b")
+                        });
+                });
+
             modelBuilder.Entity("Taskivo_Infrastructure.Models.ReminderEntity", b =>
                 {
                     b.HasOne("Taskivo_Infrastructure.Models.UserEntity", "User")
@@ -328,6 +536,25 @@ namespace TaskivoInfrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.RolePermissionEntity", b =>
+                {
+                    b.HasOne("Taskivo_Infrastructure.Models.PermissionEntity", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Taskivo_Infrastructure.Models.RoleEntity", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Taskivo_Infrastructure.Models.TaskEntity", b =>
@@ -352,6 +579,25 @@ namespace TaskivoInfrastructure.Migrations
                     b.Navigation("PriorityDetails");
 
                     b.Navigation("StatusDetails");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Taskivo_Infrastructure.Models.UserRoleEntity", b =>
+                {
+                    b.HasOne("Taskivo_Infrastructure.Models.RoleEntity", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Taskivo_Infrastructure.Models.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
