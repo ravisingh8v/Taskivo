@@ -5,4 +5,4 @@ public record CreateUserCommand(
     string Username,
     string FirstName,
     string LastName,
-    string PasswordHash);
+    string PasswordHash, Guid RoleId);

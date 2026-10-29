@@ -11,6 +11,8 @@ using Taskivo_Commands;
 using Taskivo_Commands.Auth;
 using Taskivo_Queries;
 using Taskivo_Queries.Auth;
+using Taskivo_Infrastructure.Authorization;
+using Taskivo_Common.Identity;
 
 namespace Taskivo_AppServices;
 
@@ -22,16 +24,21 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly PasswordHasher<UserEntity> _passwordHasher = new();
 
+    private readonly IRoleProvider _roleProvider;
+
     public AuthService(
         ICommandHandler<CreateUserCommand, UserEntity> createUserHandler,
         IQueryHandler<UserExistsQuery, bool> userExistsHandler,
         IQueryHandler<GetUserByUsernameQuery, UserEntity?> getUserByUsernameHandler,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IRoleProvider roleProvider
+        )
     {
         _createUserHandler = createUserHandler;
         _userExistsHandler = userExistsHandler;
         _getUserByUsernameHandler = getUserByUsernameHandler;
         _configuration = configuration;
+        _roleProvider = roleProvider;
     }
 
     public async Task<AuthResponseDto> SignupAsync(SignupRequestDto request, CancellationToken cancellationToken = default)
@@ -56,6 +63,10 @@ public class AuthService : IAuthService
             throw new BusinessException("Username already exists.", 409);
         }
 
+
+
+        var defaultRole = await _roleProvider.GetDefaultRoleAsync() ?? throw new InvalidOperationException("Default User role is not configured.");
+        
         var user = new UserEntity
         {
             Id = Guid.NewGuid(),
@@ -69,10 +80,15 @@ public class AuthService : IAuthService
 
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
         user = await _createUserHandler.Handle(
-            new CreateUserCommand(user.Id, user.Username, user.FirstName, user.LastName, user.PasswordHash),
+            new CreateUserCommand(user.Id, user.Username, user.FirstName, user.LastName, user.PasswordHash, defaultRole.Id),
             cancellationToken);
 
-        return BuildAuthResponse(user);
+
+
+        var userRoleNames = await _roleProvider.GetRoleNamesAsync(user.Id);
+
+
+        return BuildAuthResponse(user, userRoleNames);
     }
 
     public async Task<AuthResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default)
@@ -101,12 +117,14 @@ public class AuthService : IAuthService
             throw new BusinessException("Invalid username or password.", 401);
         }
 
-        return BuildAuthResponse(user);
+        var roleNames = await _roleProvider.GetRoleNamesAsync(user.Id);
+
+        return BuildAuthResponse(user, roleNames);
     }
 
-    private AuthResponseDto BuildAuthResponse(UserEntity user)
+    private AuthResponseDto BuildAuthResponse(UserEntity user, IEnumerable<string> roleNames)
     {
-        var token = GenerateJwtToken(user);
+        var token = GenerateJwtToken(user, roleNames);
 
         return new AuthResponseDto
         {
@@ -121,7 +139,7 @@ public class AuthService : IAuthService
         };
     }
 
-    private string GenerateJwtToken(UserEntity user)
+    private string GenerateJwtToken(UserEntity user, IEnumerable<string> roleNames)
     {
         var jwtKey = _configuration["Jwt:Key"];
 
@@ -132,15 +150,16 @@ public class AuthService : IAuthService
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Username),
-            new("firstname", user.FirstName),
-            new("lastname", user.LastName)
+            new(JwtClaimNames.Subject, user.Id.ToString()),
+            new(JwtClaimNames.UserId, user.Id.ToString()),
+            new(JwtClaimNames.Username, user.Username),
+            new(JwtClaimNames.Firstname, user.FirstName),
+            new(JwtClaimNames.Lastname, user.LastName)
         };
+
+        claims.AddRange(roleNames.Select(role=> new Claim(JwtClaimNames.Roles, role)));
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
