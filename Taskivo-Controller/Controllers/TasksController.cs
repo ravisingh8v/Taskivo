@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Taskivo_AppServices;
 using Taskivo_Common.Responses;
 using Taskivo_DTO;
+using Taskivo_Common.Authorization;
 
 namespace Taskivo_Controller.Controllers;
 
@@ -20,6 +21,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = PermissionNames.TasksRead)]
     [ProducesResponseType(typeof(ApiResponse<List<TaskDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<List<TaskDto>>>> GetAll()
     {
@@ -30,6 +32,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = PermissionNames.TasksRead)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<TaskDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<TaskDto>>> GetById(Guid id)
@@ -46,6 +49,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = PermissionNames.TasksCreate)]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<Guid>>> Create([FromBody] CreateTaskDto request, CancellationToken cancellationToken = default)
@@ -60,6 +64,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = PermissionNames.TasksUpdate)]
     [ProducesResponseType(typeof(ApiResponse<TaskDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
@@ -77,6 +82,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id}/status")]
+    [Authorize(Policy = PermissionNames.TasksUpdate)]
     [ProducesResponseType(typeof(ApiResponse<TaskDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
@@ -94,6 +100,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = PermissionNames.TasksDelete)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id, CancellationToken cancellationToken = default)
